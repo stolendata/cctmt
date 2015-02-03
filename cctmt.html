@@ -11,7 +11,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro&subset=latin,latin-ext" rel="stylesheet" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Source+Code+Pro&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css" />
 <title>Cryptocurrency transaction monitoring thingy</title>
 <style type="text/css">
 body { background-color: #202020;
@@ -34,14 +34,14 @@ span.gold { border-radius: 10px; background-image: linear-gradient( #c8a020, #68
 span.gray { color: #808080; border-radius: 10px; background-image: linear-gradient( #404040, #202020 ); }
 </style>
 <script type="text/javascript">
-var currency = { 'BTC' : {'symbol':'\u0243', // \u0e3f
+var currency = { 'BTC' : {'symbol':'\u0243', // alt. \u0e3f
                           'ws':'wss://ws.blockchain.info/inv',
                           'eval_amount':'for( n in resp.x.out ) amount += resp.x.out[n].value;',
                           'tx_url':'https://blockchain.info/tx/',
                           'sub_tx':'{"op":"unconfirmed_sub"}',
                           'sub_block':'{"op":"blocks_sub"}'},
                  'LTC' : {'symbol':'\u0141',
-                          'ws':'ws://ws.ltcchain.com:8000/inv',
+                          'ws':'ws://ws.ltcchain.com:8000',
                           'eval_amount':'for( n in resp.x.out ) amount += resp.x.out[n].value;',
                           'tx_url':'http://litechain.info/tx/',
                           'sub_tx':'{"op":"tx_sub"}',
@@ -55,19 +55,23 @@ var currency = { 'BTC' : {'symbol':'\u0243', // \u0e3f
                  'EUR' : '&euro;',
                  'USD' : '$' };
 var c;
-var f = 'USD'; // fixed USD fiat; chain.so doesn't relay any EUR rates yet
+var f = 'USD'; // fixed USD fiat for now, because chain.so doesn't relay any EUR rates yet
 
+// The .fill prototype works on Safari and Firefox, but Chrome insists on being garbage...
 var items = new Array( 15 );
+for( var i = 0; i < items.length; i++ )
+    items[i] = '<span class="blob">&nbsp;</span>';
+
 var coin = 100000000;
 var last = 0, txc = 0, avg = 25;
 var ws = to = null;
 
 function get_rate()
 {
-    document.getElementById( 'exch' ).innerHTML = currency[c].symbol + '1 = ' + currency[f];
-
-    if( to )
+    if( to != null )
         clearTimeout( to );
+
+    document.getElementById( 'exch' ).innerHTML = currency[c].symbol + '1 = ' + currency[f];
 
     var xml = new XMLHttpRequest();
     xml.open( 'GET', 'https://chain.so/api/v2/get_price/' + c + '/' + f, false );
@@ -81,6 +85,8 @@ function get_rate()
 
 function render()
 {
+    items.pop();
+
     var out = '';
     for( var i = 0; i < items.length; i++ )
         out += ( items[i] ? items[i] : '' ) + '<br />';
@@ -89,11 +95,13 @@ function render()
 
 function everything()
 {
+    if( ws != null )
+        ws.close();
+
     document.getElementById( 'status' ).innerHTML = 'Connecting&hellip;';
     document.getElementById( 'rate' ).innerHTML = '&hellip;';
     c = document.getElementById( 'currency' ).value;
     items.unshift( '<span class="blob green">Now monitoring ' + c + '</span>' );
-    items.pop();
     render();
 
     get_rate();
@@ -141,14 +149,13 @@ function everything()
                 last = 0;
             }
         }
-        items.pop();
         render();
     }
 }
 </script>
 </head>
 <body onload="everything();" onbeforeunload="ws.close();">
-<span id="status"></span> <a href="javascript:ws.close(); everything();">&#10227;</a> &middot; <select id="currency" onchange="ws.close(); everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output of last 25 transactions: <span id="last"></span><br /><br />
+<span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output of the last 25 transactions: <span id="last"></span><br /><br />
 <span id="tx"></span><br />
 <a href="https://github.com/stolendata/cctmt/">https://github.com/stolendata/cctmt/</a><br /><br />
 BTC: 1EDhbo9ejdKUxNW3GPBh1UmocC1ea1TvE5<br />

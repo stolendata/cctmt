@@ -9,7 +9,7 @@ Two things to keep in mind:
 
 * The order in which transactions and blocks are relayed on the network is not indicative of what blocks the transactions will be included in.
 
-* It's not possible to distinguish between principal and change outputs in a transaction; the intended transaction amount is in the majority of cases much lower than the total output the transaction comprises.
+* It's not possible to distinguish between principal and change outputs in a transaction; the intended amount in a transaction is in most cases much lower than the total output.
 
 
 Donations
