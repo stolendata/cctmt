@@ -21,6 +21,7 @@ body { background-color: #202020;
        font-family: "Source Code Pro", monospace; }
 a { color: #ffffff;
     text-decoration: none; }
+a.du { border-bottom: 1px dotted; }
 span.blob { color: #ffffff;
             font-size: 12px;
             display: inline-block;
@@ -57,7 +58,7 @@ var currency = { 'BTC' : {'symbol':'\u0243', // alt. \u0e3f
 var c;
 var f = 'USD'; // fixed USD fiat for now, because chain.so doesn't relay any EUR rates yet
 
-// The .fill prototype works on Safari and Firefox, but Chrome insists on being garbage...
+// The .fill prototype works in Safari and Firefox, but Chrome insists on being garbage...
 var items = new Array( 15 );
 for( var i = 0; i < items.length; i++ )
     items[i] = '<span class="blob">&nbsp;</span>';
@@ -135,7 +136,7 @@ function everything()
             amount /= coin;
 
             // tx, ins->outs, amount
-            items.unshift( '<span class="blob purple"><a href="' + currency[c].tx_url + resp.x.hash + '" target="_blank">' + resp.x.hash.substring( 0, 32 ) + '&hellip;</a></span> <span class="blob gray">' + resp.x.vin_sz + '\u2192' + resp.x.vout_sz + '</span> <span class="blob blue">' + currency[c].symbol + amount + '</span>' );
+            items.unshift( '<span class="blob purple"><a class="du" href="' + currency[c].tx_url + resp.x.hash + '" target="_blank">' + resp.x.hash.substring( 0, 32 ) + '&hellip;</a></span> <span class="blob gray">' + resp.x.vin_sz + '\u2192' + resp.x.vout_sz + '</span> <span class="blob blue">' + currency[c].symbol + amount + '</span>' );
 
             // fiat value
             var rate = document.getElementById( 'rate' ).innerHTML;
@@ -157,7 +158,7 @@ function everything()
 <body onload="everything();" onbeforeunload="ws.close();">
 <span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output of the last 25 transactions: <span id="last"></span><br /><br />
 <span id="tx"></span><br />
-<a href="https://github.com/stolendata/cctmt/">https://github.com/stolendata/cctmt/</a><br /><br />
+<a class="du" href="https://github.com/stolendata/cctmt/">https://github.com/stolendata/cctmt/</a><br /><br />
 BTC: 1EDhbo9ejdKUxNW3GPBh1UmocC1ea1TvE5<br />
 LTC: LaDuRFwEt1V26pmJJH94auDvxqN3rRFqPj<br />
 DOGE: DJ7vQ1dNRfebb1umVHsHxoMcd2Zq5L6LKp
