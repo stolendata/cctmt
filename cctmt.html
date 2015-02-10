@@ -39,18 +39,21 @@ var currency = { 'BTC' : {'symbol':'\u0243', // alt. \u0e3f
                           'ws':'wss://ws.blockchain.info/inv',
                           'eval_amount':'for( n in resp.x.out ) amount += resp.x.out[n].value;',
                           'tx_url':'https://blockchain.info/tx/',
+                          'block_url':'https://blockchain.info/block/',
                           'sub_tx':'{"op":"unconfirmed_sub"}',
                           'sub_block':'{"op":"blocks_sub"}'},
                  'LTC' : {'symbol':'\u0141',
                           'ws':'ws://ws.ltcchain.com:8000',
                           'eval_amount':'for( n in resp.x.out ) amount += resp.x.out[n].value;',
                           'tx_url':'http://litechain.info/tx/',
+                          'block_url':'http://litechain.info/block/',
                           'sub_tx':'{"op":"tx_sub"}',
                           'sub_block':'{"op":"block_sub"}'},
                  'DOGE' : {'symbol':'\u00d0',
                            'ws':'wss://ws.dogechain.info/inv',
                            'eval_amount':'amount = resp.x.value_out;',
                            'tx_url':'https://dogechain.info/tx/',
+                           'block_url':'https://dogechain.info/block/',
                            'sub_tx':'{"op":"unconfirmed_sub"}',
                            'sub_block':'{"op":"blocks_sub"}'},
                  'EUR' : '&euro;',
@@ -127,7 +130,7 @@ function everything()
             return;
 
         if( resp.op == 'block' )
-            items.unshift( '<span class="blob green">' + c + ' #' + resp.x.height + '</span>' );
+            items.unshift( '<span class="blob green">' + c + ' <a class="du" href="' + currency[c].block_url + resp.x.hash + '" target="_blank">#' + resp.x.height + '</a></span>' );
         else if( resp.op == 'utx' )
         {
             // eval total output
