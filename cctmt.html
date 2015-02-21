@@ -14,8 +14,10 @@
 <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css" />
 <title>Cryptocurrency transaction monitoring thingy</title>
 <style type="text/css">
-body { background-color: #202020;
-       color: #ffffff;
+html { background-image: linear-gradient( #202020, #303030 );
+       width: 100%;
+       height: 100%; }
+body { color: #ffffff;
        margin: 16px;
        font-size: 14px;
        font-family: "Source Code Pro", monospace; }
@@ -67,13 +69,19 @@ for( var i = 0; i < items.length; i++ )
     items[i] = '<span class="blob">&nbsp;</span>';
 
 var coin = 100000000;
-var last = 0, txc = 0, avg = 25;
-var ws = to = null;
+var totmin = ws = to = null;
 
 function get_rate()
 {
     if( to != null )
+    {
         clearTimeout( to );
+
+        // update the past minute's total output
+        document.getElementById( 'totmin' ).innerHTML = currency[f] + +totmin.toFixed( 1 );
+    }
+
+    totmin = 0;
 
     document.getElementById( 'exch' ).innerHTML = currency[c].symbol + '1 = ' + currency[f];
 
@@ -81,10 +89,9 @@ function get_rate()
     xml.open( 'GET', 'https://chain.so/api/v2/get_price/' + c + '/' + f, false );
     xml.send( null );
     if( xml.status == '200' )
-    {
         document.getElementById( 'rate' ).innerHTML = JSON.parse( xml.responseText ).data.prices[0].price;
-        to = window.setTimeout( 'get_rate();', 1000 * 60 );
-    }
+
+    to = window.setTimeout( 'get_rate();', 1000 * 60 );
 }
 
 function render()
@@ -111,8 +118,7 @@ function everything()
     get_rate();
 
     ws = new WebSocket( currency[c].ws );
-    last = txc = 0;
-    document.getElementById( 'last' ).innerHTML = '&hellip;'
+    document.getElementById( 'totmin' ).innerHTML = '&hellip;'
 
     ws.onopen = function()
     {
@@ -133,7 +139,7 @@ function everything()
             items.unshift( '<span class="blob green">' + c + ' <a class="du" href="' + currency[c].block_url + resp.x.hash + '" target="_blank">#' + resp.x.height + '</a></span>' );
         else if( resp.op == 'utx' )
         {
-            // eval total output
+            // eval total output in the transaction
             var amount = 0;
             eval( currency[c].eval_amount );
             amount /= coin;
@@ -144,14 +150,8 @@ function everything()
             // fiat value
             var rate = document.getElementById( 'rate' ).innerHTML;
             var fiat = amount * rate;
-            last += fiat;
+            totmin += fiat;
             items[0] += '<span class="blob gold">' + currency[f] + fiat.toFixed( fiat < 1 ? 5 : 2 ) + '</span>';
-
-            if( ++txc % avg == 0 )
-            {
-                document.getElementById( 'last' ).innerHTML = currency[f] + +last.toFixed( 1 );
-                last = 0;
-            }
         }
         render();
     }
@@ -159,7 +159,7 @@ function everything()
 </script>
 </head>
 <body onload="everything();" onbeforeunload="ws.close();">
-<span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output of the last 25 transactions: <span id="last"></span><br /><br />
+<span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output the past minute: <span id="totmin"></span><br /><br />
 <span id="tx"></span><br />
 <a class="du" href="https://github.com/stolendata/cctmt/">https://github.com/stolendata/cctmt/</a><br /><br />
 BTC: 1EDhbo9ejdKUxNW3GPBh1UmocC1ea1TvE5<br />
