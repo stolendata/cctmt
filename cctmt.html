@@ -43,27 +43,30 @@ var currency = { 'BTC' : {'symbol':'\u0243', // alt. \u0e3f
                           'tx_url':'https://blockchain.info/tx/',
                           'block_url':'https://blockchain.info/block/',
                           'sub_tx':'{"op":"unconfirmed_sub"}',
-                          'sub_block':'{"op":"blocks_sub"}'},
+                          'sub_block':'{"op":"blocks_sub"}',
+                          'sel_index':0},
                  'LTC' : {'symbol':'\u0141',
                           'ws':'ws://ws.ltcchain.com:8000',
                           'eval_amount':'for( n in resp.x.out ) amount += resp.x.out[n].value;',
                           'tx_url':'http://litechain.info/tx/',
                           'block_url':'http://litechain.info/block/',
                           'sub_tx':'{"op":"tx_sub"}',
-                          'sub_block':'{"op":"block_sub"}'},
+                          'sub_block':'{"op":"block_sub"}',
+                          'sel_index':1},
                  'DOGE' : {'symbol':'\u00d0',
                            'ws':'wss://ws.dogechain.info/inv',
                            'eval_amount':'amount = resp.x.value_out;',
                            'tx_url':'https://dogechain.info/tx/',
                            'block_url':'https://dogechain.info/block/',
                            'sub_tx':'{"op":"unconfirmed_sub"}',
-                           'sub_block':'{"op":"blocks_sub"}'},
+                           'sub_block':'{"op":"blocks_sub"}',
+                           'sel_index':2},
                  'EUR' : '&euro;',
                  'USD' : '$' };
 var c;
 var f = 'USD'; // fixed USD fiat for now, because chain.so doesn't relay any EUR rates yet
 
-// The .fill prototype works in Safari and Firefox, but Chrome insists on being garbage...
+// the .fill prototype works in Safari and Firefox, but Chrome insists on being garbage...
 var items = new Array( 15 );
 for( var i = 0; i < items.length; i++ )
     items[i] = '<span class="blob">&nbsp;</span>';
@@ -108,6 +111,14 @@ function everything()
 {
     if( ws != null )
         ws.close();
+
+    if( c == null )
+    {
+        // clumsy, but once again that's how it goes with Chrome being garbage
+        var i = location.search.substr( 1 ).toUpperCase();
+        if( currency[i] != null && currency[i].sel_index != null )
+            document.getElementById( 'currency' ).selectedIndex = currency[i].sel_index;
+    }
 
     document.getElementById( 'status' ).innerHTML = 'Connecting&hellip;';
     document.getElementById( 'rate' ).innerHTML = '&hellip;';
@@ -159,7 +170,7 @@ function everything()
 </script>
 </head>
 <body onload="everything();" onbeforeunload="ws.close();">
-<span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC" selected>BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output the past minute: <span id="totmin"></span><br /><br />
+<span id="status"></span> <a href="javascript:everything();">&#10227;</a> &middot; <select id="currency" onchange="everything();"><option value="BTC">BTC</option><option value="LTC">LTC</option><option value="DOGE">DOGE</option></select> &middot; <span id="exch"></span><span id="rate"></span> &middot; Total output the past minute: <span id="totmin"></span><br /><br />
 <span id="tx"></span><br />
 <a class="du" href="https://github.com/stolendata/cctmt/">https://github.com/stolendata/cctmt/</a><br /><br />
 BTC: 1EDhbo9ejdKUxNW3GPBh1UmocC1ea1TvE5<br />
